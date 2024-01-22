@@ -8,6 +8,7 @@ declare namespace kintone.types {
     商談メモ: kintone.fieldTypes.MultiLineText;
     対応内容: kintone.fieldTypes.DropDown;
     顧客名: kintone.fieldTypes.SingleLineText;
+    活動履歴ID: kintone.fieldTypes.Number;
     対応日時: kintone.fieldTypes.Date;
 
     対応者: kintone.fieldTypes.UserSelect;
