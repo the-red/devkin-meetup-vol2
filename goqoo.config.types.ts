@@ -8,11 +8,19 @@ export type AppId = {
   sales_activity: number // 活動履歴
 }
 
+export type ExternalApi = {
+  proxyConfigPluginId: string
+  kintone: {
+    recordsGet: { url: string; method: 'GET' }
+  }
+}
+
 export type Context = {
   env: Env
   host: string
   appId: AppId
   auth: Auth
+  externalApi: ExternalApi
 }
 
 export type Config = _Config<Env, Context>

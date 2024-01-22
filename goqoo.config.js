@@ -1,6 +1,19 @@
 // @ts-check
 
 /**
+ * @type {import('./goqoo.config.types').ExternalApi}
+ */
+const externalApi = {
+  proxyConfigPluginId: 'dchfilgefeikgiemdongclkghfopbjhc',
+  kintone: {
+    recordsGet: {
+      url: 'https://the-red.cybozu.com/k/v1/records.json',
+      method: 'GET',
+    },
+  },
+}
+
+/**
  * @type {import('./goqoo.config.types').Config}
  */
 const config = {
@@ -20,6 +33,7 @@ const config = {
         customer: 236,
         sales_activity: 237,
       },
+      externalApi,
     },
     {
       env: 'staging',
@@ -31,6 +45,7 @@ const config = {
         customer: 239,
         sales_activity: 240,
       },
+      externalApi,
     },
     {
       env: 'production',
@@ -42,6 +57,7 @@ const config = {
         customer: 242,
         sales_activity: 243,
       },
+      externalApi,
     },
   ],
 }
