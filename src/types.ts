@@ -19,3 +19,7 @@ export type DetailEvent<T> = KintoneEvent & {
   recordId: number
   reuse?: boolean
 }
+
+export type CustomerRecord = kintone.types.SavedCustomerFields
+export type ProjectRecord = kintone.types.SavedProjectFields
+export type SalesActivityRecord = kintone.types.SavedSalesActivityFields
