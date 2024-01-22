@@ -1,4 +1,5 @@
-import { DateTime, Settings } from 'luxon'
+import type { DateTime } from 'luxon'
+import { Settings } from 'luxon'
 import { isHoliday } from '@holiday-jp/holiday_jp'
 
 Settings.defaultZoneName = 'Asia/Tokyo'
