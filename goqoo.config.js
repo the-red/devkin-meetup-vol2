@@ -14,6 +14,7 @@ const config = {
       env: 'development',
       host: 'the-red.cybozu.com',
       auth: { type: 'apiToken' },
+      // auth: { type: 'oauth' },
       appId: {
         project: 235,
         customer: 236,
@@ -24,6 +25,7 @@ const config = {
       env: 'staging',
       host: 'the-red.cybozu.com',
       auth: { type: 'apiToken' },
+      // auth: { type: 'oauth' },
       appId: {
         project: 238,
         customer: 239,
@@ -34,6 +36,7 @@ const config = {
       env: 'production',
       host: 'the-red.cybozu.com',
       auth: { type: 'apiToken' },
+      // auth: { type: 'oauth' },
       appId: {
         project: 241,
         customer: 242,
