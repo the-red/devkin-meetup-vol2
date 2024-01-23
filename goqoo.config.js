@@ -10,6 +10,14 @@ const externalApi = {
       url: 'https://the-red.cybozu.com/k/v1/records.json',
       method: 'GET',
     },
+    recordsPut: {
+      url: 'https://the-red.cybozu.com/k/v1/records.json',
+      method: 'PUT',
+    },
+    commentPost: {
+      url: 'https://the-red.cybozu.com/k/v1/record/comment.json',
+      method: 'POST',
+    },
   },
 }
 

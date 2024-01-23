@@ -8,10 +8,13 @@ export type AppId = {
   sales_activity: number // 活動履歴
 }
 
+type ProxyConfig = { url: string; method: 'GET' | 'POST' | 'PUT' | 'DELETE' }
 export type ExternalApi = {
   proxyConfigPluginId: string
   kintone: {
-    recordsGet: { url: string; method: 'GET' }
+    recordsGet: ProxyConfig
+    recordsPut: ProxyConfig
+    commentPost: ProxyConfig
   }
 }
 
