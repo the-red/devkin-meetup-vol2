@@ -6,7 +6,7 @@ module.exports = {
   icon: {
     type: 'FILE',
     file: {
-      fileKey: '20240122160226875EE1E49E0B46888CA1C2762E102394003',
+      fileKey: '20240123092225A4F427570E5C48368BEED2B65D4AEA40217',
       name: '顧客リスト.png',
       contentType: 'image/png',
       size: '4047',

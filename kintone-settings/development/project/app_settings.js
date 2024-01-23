@@ -6,7 +6,7 @@ module.exports = {
   icon: {
     type: 'FILE',
     file: {
-      fileKey: '20240122160223852966EC84CA47DDB7100AE716F7669A112',
+      fileKey: '20240123093100AF30B8D806534AD1B0F3B47A5458A4E0213',
       name: '案件管理.png',
       contentType: 'image/png',
       size: '4665',

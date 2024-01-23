@@ -6,7 +6,7 @@ module.exports = {
   icon: {
     type: 'FILE',
     file: {
-      fileKey: '20240122160235476114FC3C134ED8BDB3EE5EAE69BD7D275',
+      fileKey: '2024012217242031B36BAD99A8470681A8569689F974A1087',
       name: '議事録管理.png',
       contentType: 'image/png',
       size: '4154',

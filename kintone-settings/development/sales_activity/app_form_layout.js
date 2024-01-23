@@ -23,6 +23,13 @@ module.exports = {
             width: '120',
           },
         },
+        {
+          type: 'NUMBER',
+          code: '活動履歴ID',
+          size: {
+            width: '193',
+          },
+        },
       ],
     },
     {

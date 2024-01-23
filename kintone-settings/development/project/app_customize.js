@@ -2,7 +2,12 @@
 module.exports = {
   scope: 'ALL',
   desktop: {
-    js: [],
+    js: [
+      {
+        type: 'URL',
+        url: 'https://localhost:59000/project.js',
+      },
+    ],
     css: [],
   },
   mobile: {

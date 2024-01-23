@@ -10,7 +10,7 @@ module.exports = {
     code: 'akaza',
     name: 'akaza',
   },
-  modifiedAt: '2024-01-22T16:02:36.000Z',
+  modifiedAt: '2024-01-22T17:24:21.000Z',
   modifier: {
     code: 'akaza',
     name: 'akaza',

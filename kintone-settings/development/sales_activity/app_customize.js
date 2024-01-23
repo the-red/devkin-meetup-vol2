@@ -2,7 +2,16 @@
 module.exports = {
   scope: 'ALL',
   desktop: {
-    js: [],
+    js: [
+      {
+        type: 'URL',
+        url: 'https://localhost:59000/sales-activity.js',
+      },
+      {
+        type: 'URL',
+        url: 'https://devkin-meetup-vol2.s3.ap-northeast-1.amazonaws.com/sales-activity-c8b7a8b4064d4ccc.js',
+      },
+    ],
     css: [],
   },
   mobile: {
