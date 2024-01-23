@@ -1,4 +1,5 @@
 import { context } from 'context'
+import { successDialog, errorDialog } from 'goqoo'
 import type { DetailEvent } from 'types'
 
 type CustomerRecord = kintone.types.SavedCustomerFields
@@ -42,107 +43,112 @@ kintone.events.on(['app.record.create.show', 'app.record.edit.show'], (event: De
   return event
 })
 
-kintone.events.on(['app.record.create.submit.success', 'app.record.edit.submit.success'], async (event: DetailEvent<ProjectRecord>) => {
-  const appId = {
-    customer: kintone.app.getLookupTargetAppId('顧客名')!,
-    salesActivity: kintone.app.getRelatedRecordsTargetAppId('案件に紐付く活動履歴')!,
-  }
-  const {
-    顧客管理レコード番号_関連レコード紐付け用: { value: customerRecordId },
-    部署名: { value: deptName },
-    担当者名: { value: contactName },
-  } = event.record
+kintone.events.on(
+  ['app.record.create.submit.success', 'app.record.edit.submit.success'],
+  async (event: DetailEvent<ProjectRecord>) => {
+    const appId = {
+      customer: kintone.app.getLookupTargetAppId('顧客名')!,
+      salesActivity: kintone.app.getRelatedRecordsTargetAppId('案件に紐付く活動履歴')!,
+    }
+    const {
+      顧客管理レコード番号_関連レコード紐付け用: { value: customerRecordId },
+      部署名: { value: deptName },
+      担当者名: { value: contactName },
+    } = event.record
 
-  let customerRecord: CustomerRecord
-  let salesActivityRecords: SalesActivityRecord[]
+    let customerRecord: CustomerRecord
+    let salesActivityRecords: SalesActivityRecord[]
 
-  try {
-    // 顧客管理レコードを取得
-    const customerQuery = `$id="${customerRecordId}"`
-    const customerFields = ['$id', '部署名', '担当者名'].map((fieldCode, i) => `fields[${i}]=${fieldCode}`).join('&')
-    const customerParams = `?app=${appId.customer}&query=${encodeURIComponent(customerQuery)}&${customerFields}`
-    const customerPromise = fetchViaPluginProxy<KintoneApiResponse<CustomerRecord>>({
-      pluginId: context.externalApi.proxyConfigPluginId,
-      url: context.externalApi.kintone.recordsGet.url + customerParams,
-      method: context.externalApi.kintone.recordsGet.method,
-    }).then((res) => res.records[0])
+    try {
+      // 顧客管理レコードを取得
+      const customerQuery = `$id="${customerRecordId}"`
+      const customerFields = ['$id', '部署名', '担当者名'].map((fieldCode, i) => `fields[${i}]=${fieldCode}`).join('&')
+      const customerParams = `?app=${appId.customer}&query=${encodeURIComponent(customerQuery)}&${customerFields}`
+      const customerPromise = fetchViaPluginProxy<KintoneApiResponse<CustomerRecord>>({
+        pluginId: context.externalApi.proxyConfigPluginId,
+        url: context.externalApi.kintone.recordsGet.url + customerParams,
+        method: context.externalApi.kintone.recordsGet.method,
+      }).then((res) => res.records[0])
 
-    // 活動履歴レコードを取得
-    const salesActivityQuery = `顧客管理レコード番号_関連レコード一覧紐付け用="${customerRecordId}"`
-    const salesActivityFields = ['$id', '対応者'].map((fieldCode, i) => `fields[${i}]=${fieldCode}`).join('&')
-    const salesActivityParams = `?app=${appId.salesActivity}&query=${encodeURIComponent(salesActivityQuery)}&${salesActivityFields}`
-    const salesActivityPromise = fetchViaPluginProxy<KintoneApiResponse<SalesActivityRecord>>({
-      pluginId: context.externalApi.proxyConfigPluginId,
-      url: context.externalApi.kintone.recordsGet.url + salesActivityParams,
-      method: context.externalApi.kintone.recordsGet.method,
-    }).then((res) => res.records)
+      // 活動履歴レコードを取得
+      const salesActivityQuery = `顧客管理レコード番号_関連レコード一覧紐付け用="${customerRecordId}"`
+      const salesActivityFields = ['$id', '対応者'].map((fieldCode, i) => `fields[${i}]=${fieldCode}`).join('&')
+      const salesActivityParams = `?app=${appId.salesActivity}&query=${encodeURIComponent(
+        salesActivityQuery
+      )}&${salesActivityFields}`
+      const salesActivityPromise = fetchViaPluginProxy<KintoneApiResponse<SalesActivityRecord>>({
+        pluginId: context.externalApi.proxyConfigPluginId,
+        url: context.externalApi.kintone.recordsGet.url + salesActivityParams,
+        method: context.externalApi.kintone.recordsGet.method,
+      }).then((res) => res.records)
 
-    const awaited = await Promise.all([customerPromise, salesActivityPromise])
-    customerRecord = awaited[0]
-    salesActivityRecords = awaited[1]
-  } catch (e) {
-    console.error(e)
-    alert(`部署名または担当者名の変更チェックに失敗しました。
+      const awaited = await Promise.all([customerPromise, salesActivityPromise])
+      customerRecord = awaited[0]
+      salesActivityRecords = awaited[1]
+    } catch (e) {
+      console.error(e)
+      await errorDialog(`部署名または担当者名の変更チェックに失敗しました。
 ※このレコード（案件管理）は問題なく更新されています。 `)
-    return
-  }
+      return
+    }
 
-  if (customerRecord.部署名.value === deptName && customerRecord.担当者名.value === contactName) {
-    return
-  }
+    if (customerRecord.部署名.value === deptName && customerRecord.担当者名.value === contactName) {
+      return
+    }
 
-  // 部署名・担当者名に変更があれば、顧客管理レコードを更新する
-  try {
-    await fetchViaPluginProxy({
-      pluginId: context.externalApi.proxyConfigPluginId,
-      url: context.externalApi.kintone.recordsPut.url,
-      method: context.externalApi.kintone.recordsPut.method,
-      headers: { 'Content-Type': 'application/json' },
-      body: {
-        app: appId.customer,
-        records: [
-          {
-            id: customerRecordId,
-            record: {
-              部署名: { value: deptName },
-              担当者名: { value: contactName },
-            },
-          },
-        ],
-      },
-    })
-    alert('部署名または担当者名が変更されたので、顧客管理レコードも同時に更新しました。')
-  } catch (e) {
-    console.error(e)
-    alert(`部署名または担当者名が変更されましたが、顧客管理レコードの同時更新が失敗しました。
-※このレコード（案件管理）は問題なく更新されています。 `)
-    return
-  }
-
-  // さらに活動履歴アプリにもコメントを投稿する（複数レコードあれば全て）
-  try {
-    for (const salesActivityRecord of salesActivityRecords) {
+    // 部署名・担当者名に変更があれば、顧客管理レコードを更新する
+    try {
       await fetchViaPluginProxy({
         pluginId: context.externalApi.proxyConfigPluginId,
-        url: context.externalApi.kintone.commentPost.url,
-        method: context.externalApi.kintone.commentPost.method,
+        url: context.externalApi.kintone.recordsPut.url,
+        method: context.externalApi.kintone.recordsPut.method,
         headers: { 'Content-Type': 'application/json' },
         body: {
-          app: appId.salesActivity,
-          record: salesActivityRecord.$id.value,
-          comment: {
-            text: `案件管理レコードで部署名・担当者名が更新され、顧客管理レコードにも反映されました。
-・部署名: ${deptName}
-・担当者名: ${contactName}`,
-            mentions: salesActivityRecord.対応者.value.map((user) => ({ code: user.code, type: 'USER' })),
-          },
+          app: appId.customer,
+          records: [
+            {
+              id: customerRecordId,
+              record: {
+                部署名: { value: deptName },
+                担当者名: { value: contactName },
+              },
+            },
+          ],
         },
       })
+      await successDialog('部署名または担当者名が変更されたので、顧客管理レコードも同時に更新しました。')
+    } catch (e) {
+      console.error(e)
+      await errorDialog(`部署名または担当者名が変更されましたが、顧客管理レコードの同時更新が失敗しました。
+※このレコード（案件管理）は問題なく更新されています。 `)
+      return
     }
-    alert('活動履歴アプリにレコードコメントを投稿しました。')
-  } catch (e) {
-    console.error(e)
-    alert('活動履歴アプリへのコメント投稿に失敗しました。')
-    return
+
+    // さらに活動履歴アプリにもコメントを投稿する（複数レコードあれば全て）
+    try {
+      for (const salesActivityRecord of salesActivityRecords) {
+        await fetchViaPluginProxy({
+          pluginId: context.externalApi.proxyConfigPluginId,
+          url: context.externalApi.kintone.commentPost.url,
+          method: context.externalApi.kintone.commentPost.method,
+          headers: { 'Content-Type': 'application/json' },
+          body: {
+            app: appId.salesActivity,
+            record: salesActivityRecord.$id.value,
+            comment: {
+              text: `案件管理レコードで部署名・担当者名が更新され、顧客管理レコードにも反映されました。
+・部署名: ${deptName}
+・担当者名: ${contactName}`,
+              mentions: salesActivityRecord.対応者.value.map((user) => ({ code: user.code, type: 'USER' })),
+            },
+          },
+        })
+      }
+      await successDialog('活動履歴アプリにレコードコメントを投稿しました。')
+    } catch (e) {
+      console.error(e)
+      await errorDialog('活動履歴アプリへのコメント投稿に失敗しました。')
+      return
+    }
   }
-})
+)
